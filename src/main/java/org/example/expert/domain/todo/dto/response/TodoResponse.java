@@ -1,5 +1,6 @@
 package org.example.expert.domain.todo.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import org.example.expert.domain.user.dto.response.UserResponse;
 
@@ -16,6 +17,7 @@ public class TodoResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
+    @QueryProjection
     public TodoResponse(Long id, String title, String contents, String weather, UserResponse user, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.title = title;

@@ -1,11 +1,10 @@
 package org.example.expert.domain.todo.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.example.expert.domain.todo.dto.response.QTodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
-import org.example.expert.domain.todo.entity.Todo;
-import org.example.expert.domain.user.dto.response.UserResponse;
+import org.example.expert.domain.user.dto.response.QUserResponse;
 
 import java.util.Optional;
 
@@ -22,14 +21,12 @@ public class TodoCustomRepositoryImpl implements TodoCustomRepository {
     public Optional<TodoResponse> findByTodoId(Long todoId) {
         return Optional.ofNullable(
                 queryFactory
-                        .select(Projections.constructor(TodoResponse.class,
+                        .select(new QTodoResponse(
                                 todo.id,
                                 todo.title,
                                 todo.contents,
                                 todo.weather,
-                                Projections.constructor(UserResponse.class,
-                                        todo.user.id,
-                                        todo.user.email),
+                                new QUserResponse(todo.user.id, todo.user.email),
                                 todo.createdAt,
                                 todo.modifiedAt
                                 )
