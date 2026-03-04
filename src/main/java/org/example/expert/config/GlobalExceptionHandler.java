@@ -1,5 +1,7 @@
 package org.example.expert.config;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.example.expert.domain.auth.exception.AuthException;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.common.exception.ServerException;
@@ -29,6 +31,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServerException.class)
     public ResponseEntity<Map<String, Object>> handleServerException(ServerException ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return getErrorResponse(status, ex.getMessage());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return getErrorResponse(status, ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
         return getErrorResponse(status, ex.getMessage());
     }
 
