@@ -1,0 +1,255 @@
+= API 명세서
+:toc: left
+:toclevels: 2
+:source-highlighter: highlightjs
+
+== 인증 API
+
+=== 회원가입
+이 API는 신규 회원을 등록합니다.
+
+==== Request
+include::{snippets}/auth/signup/http-request.adoc[]
+
+==== Response
+include::{snippets}/auth/signup/http-response.adoc[]
+
+=== 로그인
+이 API는 로그인을 담당합니다.
+
+==== Request
+include::{snippets}/auth/signin/http-request.adoc[]
+
+==== Response
+include::{snippets}/auth/signin/http-response.adoc[]
+
+== 댓글 API
+이 API는 댓글을 담당합니다.
+
+=== 댓글 목록 조회
+
+==== Request
+include::{snippets}/comments/get-comments/http-request.adoc[]
+
+==== Response
+include::{snippets}/comments/get-comments/http-response.adoc[]
+
+=== 댓글 등록
+
+==== Request
+include::{snippets}/comments/save-comments/http-request.adoc[]
+
+==== Response
+include::{snippets}/comments/save-comments/http-response.adoc[]
+
+=== 댓글 등록 실패: 할일이 없는 경우
+==== Request
+include::{snippets}/comments/todo-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/comments/todo-not-found/http-response.adoc[]
+
+=== 댓글 등록 실패: 유저가 없는 경우
+
+==== Request
+include::{snippets}/comments/user-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/comments/user-not-found/http-response.adoc[]
+
+== 담당자 API
+이 API는 담당자를 관리합니다.
+
+=== 담당자 등록 성공
+
+==== Request
+include::{snippets}/manager/save-manager/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/save-manager/http-response.adoc[]
+
+=== 담당자 등록 실패: 사용자가 없는 경우
+
+==== Request
+include::{snippets}/manager/invalid-user/save-fail/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/invalid-user/save-fail/http-response.adoc[]
+
+=== 담당자 등록 실패: 할일이 없는 경우
+
+==== Request
+include::{snippets}/manager/todo-not-found/save-fail/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/todo-not-found/save-fail/http-response.adoc[]
+
+==== 담당자 조회 성공
+
+==== Request
+include::{snippets}/manager/get-managers/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/get-managers/http-response.adoc[]
+
+==== 담당자 조회 실패: 할일이 없는 경우
+
+==== Request
+include::{snippets}/manager/todo-not-found/empty-managers/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/todo-not-found/empty-managers/http-response.adoc[]
+
+=== 담당자 삭제 성공
+
+==== Request
+include::{snippets}/manager/delete-manager/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/delete-manager/http-response.adoc[]
+
+=== 담당자 삭제 실패: 할일이 없는 경우
+
+==== Request
+include::{snippets}/manager/todo-not-found/delete-fail/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/todo-not-found/delete-fail/http-response.adoc[]
+
+=== 담당자 삭제 실패: 사용자가 없는 경우
+
+==== Request
+include::{snippets}/manager/invalid-user/delete-fail/http-request.adoc[]
+
+==== Response
+include::{snippets}/manager/invalid-user/delete-fail/http-response.adoc[]
+
+== 할일 API
+이 API는 할일을 담당합니다.
+
+=== 할일 생성 성공
+
+==== Request
+include::{snippets}/todo/create-todo/http-request.adoc[]
+
+==== Response
+include::{snippets}/todo/create-todo/http-response.adoc[]
+
+=== 할일 생성 실패: 사용자가 없는 경우
+
+==== Request
+include::{snippets}/todo/create-todo/exceptions/user-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/todo/create-todo/exceptions/user-not-found/http-response.adoc[]
+
+=== 할일 단건 조회 성공
+
+==== Request
+include::{snippets}/todo/get-todo/http-request.adoc[]
+
+==== Response
+include::{snippets}/todo/get-todo/http-response.adoc[]
+
+=== 할일 목록 조회 성공
+
+==== Request
+include::{snippets}/todo/get-todos/http-request.adoc[]
+
+==== Response
+include::{snippets}/todo/get-todos/http-response.adoc[]
+
+=== 할일 목록 조회 실패
+
+==== Request
+include::{snippets}/todo/todo-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/todo/todo-not-found/http-response.adoc[]
+
+== ADMIN 사용자 API
+이 API는 ADMIN 사용자만 접근할 수 있는 사용자 관련 기능을 담당합니다.
+
+=== 사용자 권한 변경 성공
+
+==== Request
+include::{snippets}/user/change-role/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-role/http-response.adoc[]
+
+=== 사용자 권한 변경 실패: 권한 없는 사용자
+
+==== Request
+include::{snippets}/user/change-role/exceptions/unauthorized/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-role/exceptions/unauthorized/http-response.adoc[]
+
+=== 사용자 권한 변경 실패: 사용자가 존재하지 않음
+
+==== Request
+include::{snippets}/user/change-role/exceptions/user-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-role/exceptions/user-not-found/http-response.adoc[]
+
+
+=== 사용자 권한 변경 실패: 유효하지 않은 권한 값
+
+==== Request
+include::{snippets}/user/change-role/exceptions/invalid-role/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-role/exceptions/invalid-role/http-response.adoc[]
+
+== 공통 사용자 API
+이 API는 모든 사용자가 접근할 수 있는 사용자 관련 기능을 담당합니다.
+
+=== 사용자 조회 성공
+
+==== Request
+include::{snippets}/user/get-user/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/get-user/http-response.adoc[]
+
+=== 사용자 조회 실패: 존재하지 않는 사용자
+
+==== Request
+include::{snippets}/user/get-user/exceptions/user-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/get-user/exceptions/user-not-found/http-response.adoc[]
+
+=== 비밀번호 변경 성공
+
+==== Request
+include::{snippets}/user/change-password/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-password/http-response.adoc[]
+
+=== 비밀번호 변경 실패: 비밀번호 중복
+
+==== Request
+include::{snippets}/user/change-password/exceptions/duplicate-password/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-password/exceptions/duplicate-password/http-response.adoc[]
+
+=== 비밀번호 변경 실패: 잘못된 비밀번호
+
+==== Request
+include::{snippets}/user/change-password/exceptions/incorrect-password/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-password/exceptions/incorrect-password/http-response.adoc[]
+
+=== 비밀번호 변경 실패: 사용자를 찾을 수 없음
+
+==== Request
+include::{snippets}/user/change-password/exceptions/user-not-found/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/change-password/exceptions/user-not-found/http-response.adoc[]

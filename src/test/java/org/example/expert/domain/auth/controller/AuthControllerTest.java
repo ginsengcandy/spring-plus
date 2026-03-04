@@ -1,6 +1,6 @@
 package org.example.expert.domain.auth.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.auth.dto.request.SigninRequest;
 import org.example.expert.domain.auth.dto.request.SignupRequest;
@@ -10,12 +10,10 @@ import org.example.expert.domain.auth.exception.AuthException;
 import org.example.expert.domain.auth.service.AuthService;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -25,13 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class AuthControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class AuthControllerTest extends RestDocsSupport {
 
     @MockBean
     private AuthService authService;
@@ -55,7 +47,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bearerToken").value("Bearer.token.value"));
+                .andExpect(jsonPath("$.bearerToken").value("Bearer.token.value"))
+                .andDo(restDocsHandler("auth/signup"));
     }
 
     @Test
@@ -72,7 +65,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("이미 존재하는 이메일입니다."));
+                .andExpect(jsonPath("$.message").value("이미 존재하는 이메일입니다."))
+                .andDo(restDocsHandler("auth/signup"));
     }
 
     @Test
@@ -89,7 +83,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("유효하지 않은 UserRole"));
+                .andExpect(jsonPath("$.message").value("유효하지 않은 UserRole"))
+                .andDo(restDocsHandler("auth/signup"));
     }
 
     // POST /auth/signin
@@ -108,7 +103,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bearerToken").value("Bearer.token.value"));
+                .andExpect(jsonPath("$.bearerToken").value("Bearer.token.value"))
+                .andDo(restDocsHandler("auth/signin"));
     }
 
     @Test
@@ -125,7 +121,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("가입되지 않은 유저입니다."));
+                .andExpect(jsonPath("$.message").value("가입되지 않은 유저입니다."))
+                .andDo(restDocsHandler("auth/signin"));
     }
 
     @Test
@@ -142,6 +139,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("잘못된 비밀번호입니다."));
+                .andExpect(jsonPath("$.message").value("잘못된 비밀번호입니다."))
+                .andDo(restDocsHandler("auth/signin"));
     }
 }

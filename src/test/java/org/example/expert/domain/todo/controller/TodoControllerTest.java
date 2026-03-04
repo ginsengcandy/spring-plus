@@ -1,7 +1,7 @@
 package org.example.expert.domain.todo.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.CustomUserDetails;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.common.exception.InvalidRequestException;
@@ -10,9 +10,7 @@ import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
 import org.example.expert.domain.todo.service.TodoService;
 import org.example.expert.domain.user.dto.response.UserResponse;
-import org.example.expert.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +19,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,8 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,13 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TodoController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class TodoControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class TodoControllerTest extends RestDocsSupport {
 
     @MockBean
     private TodoService todoService;
@@ -78,7 +69,8 @@ class TodoControllerTest {
         mockMvc.perform(get("/todos/{todoId}", todoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(todoId))
-                .andExpect(jsonPath("$.title").value(title));
+                .andExpect(jsonPath("$.title").value(title))
+                .andDo(restDocsHandler("todo/get-todo"));
     }
 
     @Test
@@ -95,7 +87,8 @@ class TodoControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value("Todo not found"));
+                .andExpect(jsonPath("$.message").value("Todo not found"))
+                .andDo(restDocsHandler("todo/todo-not-found"));
     }
 
     @Test
@@ -120,7 +113,8 @@ class TodoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
                 .andExpect(jsonPath("$.content[0].weather").value(weather))
-                .andExpect(jsonPath("$.content[1].weather").value(weather));
+                .andExpect(jsonPath("$.content[1].weather").value(weather))
+                .andDo(restDocsHandler("todo/get-todos"));
     }
 
     @Test
@@ -152,7 +146,8 @@ class TodoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.title").value("제목"))
-                .andExpect(jsonPath("$.weather").value("맑음"));
+                .andExpect(jsonPath("$.weather").value("맑음"))
+                .andDo(restDocsHandler("todo/create-todo"));
     }
 
     @Test
@@ -180,6 +175,7 @@ class TodoControllerTest {
                         })
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andDo(restDocsHandler("todo/create-todo/exceptions/user-not-found"));
     }
 }

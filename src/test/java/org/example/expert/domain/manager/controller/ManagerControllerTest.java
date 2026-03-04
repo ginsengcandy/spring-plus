@@ -1,6 +1,6 @@
 package org.example.expert.domain.manager.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.CustomUserDetails;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.common.exception.InvalidRequestException;
@@ -11,7 +11,6 @@ import org.example.expert.domain.manager.service.ManagerService;
 import org.example.expert.domain.user.dto.response.UserResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
@@ -33,13 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ManagerController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class ManagerControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class ManagerControllerTest extends RestDocsSupport {
 
     @MockBean
     private ManagerService managerService;
@@ -87,7 +79,8 @@ class ManagerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.user.id").value(2L))
-                .andExpect(jsonPath("$.user.email").value("manager@example.com"));
+                .andExpect(jsonPath("$.user.email").value("manager@example.com"))
+                .andDo(restDocsHandler("manager/save-manager"));
     }
 
     @Test
@@ -107,7 +100,8 @@ class ManagerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Todo not found"));
+                .andExpect(jsonPath("$.message").value("Todo not found"))
+                .andDo(restDocsHandler("manager/todo-not-found/save-fail"));
     }
 
     @Test
@@ -127,7 +121,8 @@ class ManagerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("담당자를 등록하려고 하는 유저가 유효하지 않거나, 일정을 만든 유저가 아닙니다."));
+                .andExpect(jsonPath("$.message").value("담당자를 등록하려고 하는 유저가 유효하지 않거나, 일정을 만든 유저가 아닙니다."))
+                .andDo(restDocsHandler("manager/invalid-user/save-fail"));
     }
 
     // GET /todos/{todoId}/managers
@@ -151,7 +146,8 @@ class ManagerControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].user.email").value("user1@example.com"))
                 .andExpect(jsonPath("$[1].id").value(2L))
-                .andExpect(jsonPath("$[1].user.email").value("user2@example.com"));
+                .andExpect(jsonPath("$[1].user.email").value("user2@example.com"))
+                .andDo(restDocsHandler("manager/get-managers"));
     }
 
     @Test
@@ -166,7 +162,8 @@ class ManagerControllerTest {
         // then
         mockMvc.perform(get("/todos/{todoId}/managers", todoId))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("할일을 찾을 수 없습니다."));
+                .andExpect(jsonPath("$.message").value("할일을 찾을 수 없습니다."))
+                .andDo(restDocsHandler("manager/todo-not-found/empty-managers"));
     }
 
     // DELETE /todos/{todoId}/managers/{managerId}
@@ -181,7 +178,8 @@ class ManagerControllerTest {
         // then
         mockMvc.perform(delete("/todos/{todoId}/managers/{managerId}", todoId, managerId)
                         .with(withAuth(userId)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(restDocsHandler("manager/delete-manager"));
     }
 
     @Test
@@ -199,7 +197,8 @@ class ManagerControllerTest {
         mockMvc.perform(delete("/todos/{todoId}/managers/{managerId}", todoId, managerId)
                         .with(withAuth(userId)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Todo not found"));
+                .andExpect(jsonPath("$.message").value("Todo not found"))
+                .andDo(restDocsHandler("manager/todo-not-found/delete-fail"));
     }
 
     @Test
@@ -217,6 +216,7 @@ class ManagerControllerTest {
         mockMvc.perform(delete("/todos/{todoId}/managers/{managerId}", todoId, managerId)
                         .with(withAuth(userId)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("해당 일정에 등록된 담당자가 아닙니다."));
+                .andExpect(jsonPath("$.message").value("해당 일정에 등록된 담당자가 아닙니다."))
+                .andDo(restDocsHandler("manager/invalid-user/delete-fail"));
     }
 }

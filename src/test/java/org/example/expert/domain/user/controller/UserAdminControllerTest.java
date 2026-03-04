@@ -1,23 +1,21 @@
 package org.example.expert.domain.user.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.user.dto.request.UserRoleChangeRequest;
 import org.example.expert.domain.user.service.UserAdminService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
@@ -32,13 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserAdminController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @EnableMethodSecurity
-class UserAdminControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class UserAdminControllerTest extends RestDocsSupport {
 
     @MockBean
     private UserAdminService userAdminService;
@@ -73,7 +65,8 @@ class UserAdminControllerTest {
                         .with(withRole("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(restDocsHandler("user/change-role"));
     }
 
     @Test
@@ -87,7 +80,8 @@ class UserAdminControllerTest {
                         .with(withRole("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andDo(restDocsHandler("user/change-role/exceptions/unauthorized"));
     }
 
     @Test
@@ -106,7 +100,8 @@ class UserAdminControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andDo(restDocsHandler("user/change-role/exceptions/user-not-found"));
     }
 
     @Test
@@ -125,6 +120,7 @@ class UserAdminControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("유효하지 않은 UserRole"));
+                .andExpect(jsonPath("$.message").value("유효하지 않은 UserRole"))
+                .andDo(restDocsHandler("user/change-role/exceptions/invalid-role"));
     }
 }

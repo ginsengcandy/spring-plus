@@ -2,6 +2,7 @@ package org.example.expert.domain.comment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.CustomUserDetails;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.comment.dto.request.CommentSaveRequest;
@@ -27,7 +28,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,13 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CommentController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class CommentControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class CommentControllerTest extends RestDocsSupport {
 
     @MockBean
     private CommentService commentService;
@@ -90,7 +86,8 @@ class CommentControllerTest {
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.contents").value("댓글 내용"))
                 .andExpect(jsonPath("$.user.id").value(userId))
-                .andExpect(jsonPath("$.user.email").value("user@example.com"));
+                .andExpect(jsonPath("$.user.email").value("user@example.com"))
+                .andDo(restDocsHandler("comments/save-comments"));
     }
 
     @Test
@@ -110,7 +107,8 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
+                .andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."))
+                .andDo(restDocsHandler("comments/user-not-found"));
     }
 
     @Test
@@ -130,7 +128,8 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Todo not found"));
+                .andExpect(jsonPath("$.message").value("Todo not found"))
+                .andDo(restDocsHandler("comments/todo-not-found"));
     }
 
     // GET /todos/{todoId}/comments
@@ -156,6 +155,7 @@ class CommentControllerTest {
                 .andExpect(jsonPath("$[0].email").value("user1@example.com"))
                 .andExpect(jsonPath("$[1].commentId").value(2L))
                 .andExpect(jsonPath("$[1].contents").value("두 번째 댓글"))
-                .andExpect(jsonPath("$[1].email").value("user2@example.com"));
+                .andExpect(jsonPath("$[1].email").value("user2@example.com"))
+                .andDo(restDocsHandler("comments/get-comments"));
     }
 }

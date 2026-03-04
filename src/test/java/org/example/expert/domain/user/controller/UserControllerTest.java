@@ -1,7 +1,7 @@
 package org.example.expert.domain.user.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import org.example.expert.RestDocsSupport;
 import org.example.expert.config.CustomUserDetails;
 import org.example.expert.config.JwtFilter;
 import org.example.expert.domain.common.exception.InvalidRequestException;
@@ -10,7 +10,6 @@ import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
@@ -33,13 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class UserControllerTest extends RestDocsSupport {
 
     @MockBean
     private UserService userService;
@@ -78,7 +70,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId))
-                .andExpect(jsonPath("$.email").value("user@example.com"));
+                .andExpect(jsonPath("$.email").value("user@example.com"))
+                .andDo(restDocsHandler("user/get-user"));
     }
 
     @Test
@@ -93,7 +86,8 @@ class UserControllerTest {
         // then
         mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andDo(restDocsHandler("user/get-user/exceptions/user-not-found"));
     }
 
     @Test
@@ -107,7 +101,8 @@ class UserControllerTest {
                         .with(withAuth(userId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(restDocsHandler("user/change-password"));
     }
 
     @Test
@@ -125,7 +120,8 @@ class UserControllerTest {
                         .with(withAuth(userId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andDo(restDocsHandler("user/change-password/exceptions/user-not-found"));
     }
 
     @Test
@@ -144,7 +140,8 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("새 비밀번호는 기존 비밀번호와 같을 수 없습니다."));
+                .andExpect(jsonPath("$.message").value("새 비밀번호는 기존 비밀번호와 같을 수 없습니다."))
+                .andDo(restDocsHandler("user/change-password/exceptions/duplicate-password"));
     }
 
     @Test
@@ -163,6 +160,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("잘못된 비밀번호입니다."));
+                .andExpect(jsonPath("$.message").value("잘못된 비밀번호입니다."))
+                .andDo(restDocsHandler("user/change-password/exceptions/incorrect-password"));
     }
 }
